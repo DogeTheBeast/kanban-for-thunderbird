@@ -1,0 +1,197 @@
+/* Kanban Thunderbird Styles */
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    margin: 0;
+    padding: 10px;
+    background-color: #1E1E21;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #4A4A52;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.5em;
+    color: #FBFBFE;
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+#new-task-btn {
+    background-color: #2A2A2E;
+    color: #FBFBFE;
+    border: 1px solid #4A4A52;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+#new-task-btn:hover {
+    background-color: #3A3A3D;
+}
+
+#refresh-btn {
+    background-color: #0A84FF;
+    color: #FBFBFE;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+#refresh-btn:hover {
+    background-color: #0060DF;
+}
+
+#kanban-columns {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding-bottom: 20px;
+}
+
+.kanban-column {
+    flex: 1;
+    min-width: 0;
+    background-color: #2A2A2E;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3), 0 0 0 1px rgba(10,132,255,0.4);
+    display: flex;
+    flex-direction: column;
+}
+
+.column-header {
+    padding: 15px;
+    border-bottom: 1px solid #4A4A52;
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #FBFBFE;
+    background-color: #323234;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.column-header h2 {
+    margin: 0;
+    font-size: 1em;
+    text-transform: capitalize;
+}
+
+.column-content {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 100px;
+    padding: 10px;
+}
+
+.task-card {
+    background-color: #2A2A2E;
+    border: 1px solid #4A4A52;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    padding: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.task-card:active {
+    cursor: pointer;
+}
+
+.task-card.overdue {
+    background-color: #3A1E1E;
+    border-color: #5A2A2A;
+}
+
+.task-card.overdue:hover {
+    background-color: #4A2525;
+}
+
+.task-card:hover {
+    background-color: #3A3A3D;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    transform: translateY(-2px);
+}
+
+.task-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #FBFBFE;
+    font-size: 1.1em;
+}
+
+.task-description {
+    color: #CFCFD8;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.task-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8em;
+    color: #8F8F9D;
+}
+
+.task-due {
+    font-style: italic;
+}
+
+.task-category {
+    background-color: #3A3A3D;
+    color: #CFCFD8;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+/* Drag and drop styles */
+.task-card.dragging {
+    opacity: 0.5;
+    transform: scale(1.02);
+}
+
+.kanban-column.dragover {
+    border-top: 3px solid #0A84FF;
+}
+
+/* Empty column state */
+.empty-column {
+    text-align: center;
+    color: #8F8F9D;
+    font-style: italic;
+    padding: 40px 20px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    body {
+        padding: 5px;
+    }
+    
+    .kanban-column {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .column-header {
+        padding: 12px;
+    }
+    
+    .task-card {
+        padding: 10px;
+    }
+}

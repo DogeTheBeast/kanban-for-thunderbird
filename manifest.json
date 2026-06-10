@@ -1,0 +1,106 @@
+{
+  "manifest_version": 2,
+  "name": "Kanban Thunderbird",
+  "version": "1.0",
+  "description": "Organize Thunderbird tasks into a Kanban board",
+	"author": "Ratiq Narwal",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "DogeTheBeast.kanban-for-thunderbird@addons.thunderbird.net",
+      "strict_min_version": "128.0",
+      "strict_max_version": "150.*"
+    }
+  },
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "browser_action": {
+    "default_icon": {
+      "16": "icons/icon-16.svg",
+      "32": "icons/icon-32.svg"
+    },
+    "default_title": "Open Kanban Board"
+  },
+  "experiment_apis": {
+    "calendar_calendars": {
+      "schema": "calendar/experiments/calendar/schema/calendar-calendars.json",
+      "parent": {
+        "scopes": ["addon_parent"],
+        "script": "calendar/experiments/calendar/parent/ext-calendar-calendars.js",
+        "paths": [
+          ["calendar", "calendars"]
+        ]
+      }
+    },
+    "calendar_items": {
+      "schema": "calendar/experiments/calendar/schema/calendar-items.json",
+      "parent": {
+        "scopes": ["addon_parent"],
+        "script": "calendar/experiments/calendar/parent/ext-calendar-items.js",
+        "paths": [
+          ["calendar", "items"]
+        ]
+      }
+    },
+    "calendar_provider": {
+      "schema": "calendar/experiments/calendar/schema/calendar-provider.json",
+      "parent": {
+        "scopes": ["addon_parent"],
+        "script": "calendar/experiments/calendar/parent/ext-calendar-provider.js",
+        "events": ["startup"],
+        "paths": [
+          ["calendar", "provider"]
+        ]
+      }
+    },
+    "calendar_timezones": {
+      "schema": "calendar/experiments/calendar/schema/calendar-timezones.json",
+      "parent": {
+        "scopes": ["addon_parent"],
+        "script": "calendar/experiments/calendar/parent/ext-calendar-timezones.js",
+        "paths": [
+          ["calendar", "timezones"]
+        ]
+      },
+      "child": {
+        "scopes": ["addon_child"],
+        "script": "calendar/experiments/calendar/child/ext-calendar-timezones.js",
+        "paths": [
+          ["calendar", "timezones"]
+        ]
+      }
+    },
+    "calendarItemAction": {
+      "schema": "calendar/experiments/calendar/schema/calendarItemAction.json",
+      "parent": {
+        "scopes": ["addon_parent"],
+        "script": "calendar/experiments/calendar/parent/ext-calendarItemAction.js",
+        "events": ["startup"],
+        "paths": [
+          ["calendarItemAction"]
+        ]
+      }
+    },
+    "calendarItemDetails": {
+      "schema": "calendar/experiments/calendar/schema/calendarItemDetails.json",
+      "parent": {
+        "scopes": ["addon_parent"],
+        "script": "calendar/experiments/calendar/parent/ext-calendarItemDetails.js",
+        "events": ["startup"],
+        "paths": [
+          ["calendarItemDetails"]
+        ]
+      }
+    }
+	},
+  "web_accessible_resources": [
+    "kanban.html",
+    "kanban.css",
+    "kanban.js",
+    "icons/*"
+  ]
+}
