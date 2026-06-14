@@ -1,11 +1,8 @@
 // Background script for Kanban Thunderbird extension
 
-// Handle browser action click to open Kanban tab
-browser.browserAction.onClicked.addListener(function (tab) {
-  // Create a new tab with our Kanban UI
-  browser.tabs.create({
-    url: browser.runtime.getURL("kanban.html"),
-  });
+browser.spaces.create("Kanban_Board", "kanban.html", {
+  title: "Kanban Board",
+  defaultIcons: "icons/sidebar.png",
 });
 
 // Listen for calendar item changes and notify kanban tabs
@@ -99,6 +96,30 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       })
       .catch(function (error) {
         console.error("Error opening task create window", error);
+        sendResponse({ error: error.message });
+      });
+    return true;
+  }
+
+  //make the query specific to complete tasks
+  //
+  if (request.action === "clearDoneTasks") {
+    browser.calendar.items
+      .query({ type: "task" })
+      .then(function (items) {
+        const doneTasks = items.filter(
+          (task) => task.item && task.item.status === "COMPLETED",
+        );
+        const deletePromises = doneTasks.map((task) =>
+          browser.calendar.items.remove(task.calendarId, task.id),
+        );
+        return Promise.all(deletePromises);
+      })
+      .then(function () {
+        sendResponse({ success: true });
+      })
+      .catch(function (error) {
+        console.error("Error clearing done tasks:", error);
         sendResponse({ error: error.message });
       });
     return true;

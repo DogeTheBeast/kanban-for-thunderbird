@@ -57,6 +57,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const heading = document.createElement("h2");
     heading.textContent = columnName;
     headerDiv.appendChild(heading);
+
+    if (columnName === "Done") {
+      const clearBtn = document.createElement("button");
+      clearBtn.className = "clear-done-btn";
+      clearBtn.textContent = "Clear Done";
+      clearBtn.addEventListener("click", clearDoneTasks);
+      headerDiv.appendChild(clearBtn);
+    }
+
     columnDiv.appendChild(headerDiv);
 
     const contentDiv = document.createElement("div");
@@ -227,10 +236,13 @@ document.addEventListener("DOMContentLoaded", function () {
     if (task.category && task.category.length > 0) {
       const catDiv = document.createElement("div");
       catDiv.className = "task-meta";
-      const catSpan = document.createElement("span");
-      catSpan.className = "task-category";
-      catSpan.textContent = `Categories: ${task.category.join(", ")}`;
-      catDiv.appendChild(catSpan);
+      task.category.forEach((cat) => {
+        const catSpan = document.createElement("span");
+        catSpan.className = "task-category";
+        catSpan.textContent = cat;
+        catSpan.style.backgroundColor = getCategoryColor(cat);
+        catDiv.appendChild(catSpan);
+      });
       taskDiv.appendChild(catDiv);
     }
 
@@ -356,6 +368,29 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
     return false;
+  }
+
+  function clearDoneTasks() {
+    if (!confirm("Delete all completed tasks? This cannot be undone.")) {
+      return;
+    }
+    browser.runtime.sendMessage({ action: "clearDoneTasks" }, function (response) {
+      if (response.error) {
+        alert(`Failed to clear done tasks: ${response.error}`);
+      } else {
+        initializeBoard();
+      }
+    });
+  }
+
+  // Generate consistent color from category name using hash
+  function getCategoryColor(categoryName) {
+    let hash = 0;
+    for (let i = 0; i < categoryName.length; i++) {
+      hash = categoryName.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const hue = Math.abs(hash) % 360;
+    return `hsl(${hue}, 60%, 28%)`;
   }
 
   // Expose browser object for compatibility

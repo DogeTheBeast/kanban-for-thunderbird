@@ -18,13 +18,6 @@
     "storage",
     "tabs"
   ],
-  "browser_action": {
-    "default_icon": {
-      "16": "icons/icon-16.svg",
-      "32": "icons/icon-32.svg"
-    },
-    "default_title": "Open Kanban Board"
-  },
   "experiment_apis": {
     "calendar_calendars": {
       "schema": "calendar/experiments/calendar/schema/calendar-calendars.json",
