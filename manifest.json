@@ -8,7 +8,7 @@
     "gecko": {
       "id": "DogeTheBeast.kanban-for-thunderbird@addons.thunderbird.net",
       "strict_min_version": "128.0",
-      "strict_max_version": "150.*"
+      "strict_max_version": "*"
     }
   },
   "background": {

@@ -4,6 +4,8 @@ A Thunderbird Mail Extension that turns your tasks into a visual Kanban board.
 
 Organize tasks by dragging them across columns — **To Do**, **In Progress**, **Done**, **Cancelled**. Status changes are persisted back to Thunderbird's built-in calendar via custom experiment APIs.
 
+![Example]("./assets/example.png")
+
 ## Features
 
 - Renders Thunderbird tasks as draggable Kanban cards
