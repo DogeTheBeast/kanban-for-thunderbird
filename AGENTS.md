@@ -1,11 +1,11 @@
-# Kanban for Thunderbird — Agent Guide
+# Tanban — Agent Guide
 
 ## Project Overview
 
 Thunderbird Mail Extension (Manifest V2) that renders tasks as a Kanban board.
 No build system, no bundler, no transpiler — plain vanilla JS loaded directly.
 
-- **Extension ID**: `DogeTheBeast.kanban-for-thunderbird@addons.thunderbird.net`
+- **Extension ID**: `DogeTheBeast.tanban@addons.thunderbird.net`
 - **Target**: Thunderbird 128.0 – 150.*
 - **Permissions**: `storage`, `tabs`
 - **Key APIs**: `browser.*` WebExtension APIs + 6 custom calendar experiment APIs
