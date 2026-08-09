@@ -8,8 +8,17 @@ document.addEventListener("DOMContentLoaded", function () {
   // Define our Kanban columns
   const columns = ["To Do", "In Progress", "Done", "Cancelled"];
 
+  // Store the full unfiltered task data for client-side filtering
+  var allColumnsData = null;
+
+  // Track multi-select category filter state
+  var selectedCategories = {};
+
+  // Sentinel key and display label for the "Uncategorized" filter option
+  var UNCATEGORIZED_KEY = "__uncategorized__";
+  var UNCATEGORIZED_LABEL = "Uncategorized";
+
   // Initialize the board
-  initializeBoard();
 
   // Listen for background-triggered refresh signals
   browser.runtime.onMessage.addListener(function (request) {
@@ -18,10 +27,35 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  // Category filter dropdown and input handlers
+  var filterInput = document.getElementById("category-filter");
+  var categoryDropdown = document.getElementById("category-dropdown");
+
+  filterInput.addEventListener("input", function () {
+    rebuildDropdown(filterInput.value);
+    showDropdown();
+  });
+
+  filterInput.addEventListener("focus", function () {
+    rebuildDropdown(filterInput.value);
+    showDropdown();
+  });
+
+  filterInput.addEventListener("blur", function () {
+    setTimeout(hideDropdown, 150);
+  });
+
+  // Prevent blur from hiding dropdown when clicking a dropdown item
+  categoryDropdown.addEventListener("mousedown", function (e) {
+    e.preventDefault();
+  });
+
   // Refresh button handler
   refreshBtn.addEventListener("click", function () {
     initializeBoard();
   });
+
+  initializeBoard();
 
   // New task button handler
   newTaskBtn.addEventListener("click", function () {
@@ -37,6 +71,13 @@ document.addEventListener("DOMContentLoaded", function () {
   function initializeBoard() {
     // Clear existing content
     kanbanColumns.innerHTML = "";
+
+    // Reset all filter state
+    allColumnsData = null;
+    selectedCategories = {};
+    filterInput.value = "";
+    hideDropdown();
+    updateFilterBar();
 
     // Create column containers
     columns.forEach((columnName) => {
@@ -128,7 +169,177 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  function applyFilters() {
+    var selectedKeys = Object.keys(selectedCategories);
+    var filteredData = {};
+
+    columns.forEach(function (columnName) {
+      var tasks = allColumnsData[columnName] || [];
+      if (selectedKeys.length === 0) {
+        filteredData[columnName] = tasks;
+      } else {
+        var hasUncategorized = selectedKeys.indexOf(UNCATEGORIZED_KEY) !== -1;
+        filteredData[columnName] = tasks.filter(function (task) {
+          var taskCats = task.category || [];
+          // Uncategorized tasks match when the sentinel is selected
+          if (hasUncategorized && taskCats.length === 0) {
+            return true;
+          }
+          // Match by category name (OR logic)
+          return taskCats.some(function (cat) {
+            return selectedKeys.indexOf(cat.toLowerCase()) !== -1;
+          });
+        });
+      }
+    });
+
+    populateColumns(filteredData);
+  }
+
+  function getAllCategories() {
+    var seen = {};
+    var result = [];
+    if (!allColumnsData) return result;
+    columns.forEach(function (colName) {
+      (allColumnsData[colName] || []).forEach(function (task) {
+        (task.category || []).forEach(function (cat) {
+          var key = cat.toLowerCase();
+          if (!seen[key]) {
+            seen[key] = true;
+            result.push(cat);
+          }
+        });
+      });
+    });
+    // If any task has no categories, add the Uncategorized sentinel
+    columns.forEach(function (colName) {
+      (allColumnsData[colName] || []).forEach(function (task) {
+        var taskCats = task.category || [];
+        if (taskCats.length === 0 && !seen[UNCATEGORIZED_KEY]) {
+          seen[UNCATEGORIZED_KEY] = true;
+          result.push(UNCATEGORIZED_KEY);
+        }
+      });
+    });
+    return result.sort();
+  }
+
+  function rebuildDropdown(filterText) {
+    categoryDropdown.textContent = "";
+    var allCats = getAllCategories();
+    var lowerFilter = filterText.toLowerCase();
+    var matched = allCats.filter(function (cat) {
+      return cat.toLowerCase().indexOf(lowerFilter) !== -1;
+    });
+
+    if (matched.length === 0) {
+      var noMatch = document.createElement("li");
+      noMatch.className = "no-match";
+      noMatch.textContent = "No categories found";
+      categoryDropdown.appendChild(noMatch);
+      return;
+    }
+
+    matched.forEach(function (cat) {
+      var key = cat.toLowerCase();
+      var isSelected = selectedCategories.hasOwnProperty(key);
+
+      var li = document.createElement("li");
+      if (isSelected) {
+        li.className = "selected";
+      }
+      li.dataset.category = cat;
+
+      var checkSpan = document.createElement("span");
+      checkSpan.className = "checkmark";
+      checkSpan.textContent = "\u2713";
+      li.appendChild(checkSpan);
+
+      var label = cat === UNCATEGORIZED_KEY ? UNCATEGORIZED_LABEL : cat;
+      li.appendChild(document.createTextNode(label));
+
+      li.addEventListener("click", function () {
+        if (selectedCategories.hasOwnProperty(key)) {
+          delete selectedCategories[key];
+        } else {
+          selectedCategories[key] = cat;
+        }
+        rebuildDropdown(filterInput.value);
+        updateFilterBar();
+        applyFilters();
+      });
+      categoryDropdown.appendChild(li);
+    });
+  }
+
+  function updateFilterBar() {
+    var bar = document.getElementById("active-filters");
+    bar.textContent = "";
+    var keys = Object.keys(selectedCategories);
+
+    if (keys.length === 0) {
+      bar.style.display = "none";
+      return;
+    }
+
+    bar.style.display = "flex";
+
+    // "Clear filters" button
+    var clearBtn = document.createElement("button");
+    clearBtn.className = "clear-filters-btn";
+    clearBtn.textContent = "Clear filters";
+    clearBtn.addEventListener("click", function () {
+      selectedCategories = {};
+      rebuildDropdown(filterInput.value);
+      updateFilterBar();
+      applyFilters();
+    });
+    bar.appendChild(clearBtn);
+
+    // One chip per selected category
+    keys.forEach(function (key) {
+      var cat = selectedCategories[key];
+      var displayName = cat === UNCATEGORIZED_KEY ? UNCATEGORIZED_LABEL : cat;
+      var chip = document.createElement("span");
+      chip.className = "filter-chip";
+      chip.style.backgroundColor = getCategoryColor(cat);
+
+      var label = document.createTextNode(displayName);
+      chip.appendChild(label);
+
+      var removeBtn = document.createElement("span");
+      removeBtn.className = "remove-btn";
+      removeBtn.textContent = " \u00D7";
+      removeBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        delete selectedCategories[key];
+        rebuildDropdown(filterInput.value);
+        updateFilterBar();
+        applyFilters();
+      });
+      chip.appendChild(removeBtn);
+
+      bar.appendChild(chip);
+    });
+  }
+
+  function showDropdown() {
+    categoryDropdown.style.display = "block";
+  }
+
+  function hideDropdown() {
+    categoryDropdown.style.display = "none";
+  }
+
   function populateColumns(columnsData) {
+    // Store unfiltered data on first load (only if not already a filtered subset)
+    if (!allColumnsData) {
+      allColumnsData = {};
+      columns.forEach(function (columnName) {
+        allColumnsData[columnName] = (columnsData[columnName] || []).slice();
+      });
+    }
+
     // Clear existing tasks
     columns.forEach((columnName) => {
       const contentDiv = document.getElementById(
@@ -136,6 +347,9 @@ document.addEventListener("DOMContentLoaded", function () {
       );
       contentDiv.textContent = "";
     });
+
+    // Check if a category filter is active
+    var isFilterActive = Object.keys(selectedCategories).length > 0;
 
     // Populate each column with tasks
     columns.forEach((columnName) => {
@@ -147,7 +361,9 @@ document.addEventListener("DOMContentLoaded", function () {
       if (tasks.length === 0) {
         const emptyDiv = document.createElement("div");
         emptyDiv.className = "empty-column";
-        emptyDiv.textContent = "No tasks";
+        emptyDiv.textContent = isFilterActive
+          ? "No matching tasks"
+          : "No tasks";
         contentDiv.appendChild(emptyDiv);
         return;
       }
@@ -374,17 +590,24 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!confirm("Delete all completed tasks? This cannot be undone.")) {
       return;
     }
-    browser.runtime.sendMessage({ action: "clearDoneTasks" }, function (response) {
-      if (response.error) {
-        alert(`Failed to clear done tasks: ${response.error}`);
-      } else {
-        initializeBoard();
-      }
-    });
+    browser.runtime.sendMessage(
+      { action: "clearDoneTasks" },
+      function (response) {
+        if (response.error) {
+          alert(`Failed to clear done tasks: ${response.error}`);
+        } else {
+          initializeBoard();
+        }
+      },
+    );
   }
 
   // Generate consistent color from category name using hash
   function getCategoryColor(categoryName) {
+    // Uncategorized gets a neutral grey
+    if (categoryName === UNCATEGORIZED_KEY) {
+      return "hsl(0, 0%, 32%)";
+    }
     let hash = 0;
     for (let i = 0; i < categoryName.length; i++) {
       hash = categoryName.charCodeAt(i) + ((hash << 5) - hash);

@@ -10,11 +10,17 @@
         <header>
             <h1>Kanban Board</h1>
             <div class="header-actions">
+                <div class="filter-wrapper">
+                    <input type="text" id="category-filter" placeholder="Search categories…" />
+                    <ul id="category-dropdown" class="category-dropdown"></ul>
+                </div>
                 <button id="new-task-btn">+ New Task</button>
                 <button id="refresh-btn">Refresh Tasks</button>
             </div>
         </header>
         
+        <div id="active-filters" class="active-filters"></div>
+
         <div id="kanban-columns">
             <!-- Columns will be dynamically generated here -->
         </div>

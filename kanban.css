@@ -29,6 +29,142 @@ header h1 {
   gap: 8px;
 }
 
+#category-filter {
+  background-color: #2a2a2e;
+  color: #fbfbfe;
+  border: 1px solid #4a4a52;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  outline: none;
+  transition: border-color 0.2s ease;
+  min-width: 180px;
+}
+
+#category-filter::placeholder {
+  color: #8f8f9d;
+}
+
+#category-filter:focus {
+  border-color: #0a84ff;
+  box-shadow: 0 0 0 1px rgba(10, 132, 255, 0.3);
+}
+
+.filter-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.category-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: none;
+  margin: 2px 0 0 0;
+  padding: 4px 0;
+  list-style: none;
+  background-color: #2a2a2e;
+  border: 1px solid #4a4a52;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.category-dropdown li {
+  padding: 6px 12px;
+  cursor: pointer;
+  color: #fbfbfe;
+  font-size: 0.85em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.category-dropdown li:hover {
+  background-color: #3a3a3d;
+}
+
+.category-dropdown li.no-match {
+  color: #8f8f9d;
+  cursor: default;
+  font-style: italic;
+}
+
+.category-dropdown li.no-match:hover {
+  background-color: transparent;
+}
+
+.category-dropdown li .checkmark {
+  display: inline-block;
+  width: 16px;
+  margin-right: 4px;
+  color: #0a84ff;
+  visibility: hidden;
+}
+
+.category-dropdown li.selected {
+  background-color: rgba(10, 132, 255, 0.15);
+}
+
+.category-dropdown li.selected .checkmark {
+  visibility: visible;
+}
+
+.active-filters {
+  display: none;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding: 8px 4px;
+  margin-bottom: 12px;
+  min-height: 0;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #fbfbfe;
+  font-size: 0.8em;
+  padding: 3px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.filter-chip .remove-btn {
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.1em;
+  line-height: 1;
+  padding: 0 2px;
+  border-radius: 2px;
+  opacity: 0.8;
+}
+
+.filter-chip .remove-btn:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.clear-filters-btn {
+  background: none;
+  border: 1px solid #4a4a52;
+  color: #8f8f9d;
+  font-size: 0.75em;
+  padding: 3px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.clear-filters-btn:hover {
+  color: #fbfbfe;
+  border-color: #fbfbfe;
+}
+
 #new-task-btn {
   background-color: #2a2a2e;
   color: #fbfbfe;
