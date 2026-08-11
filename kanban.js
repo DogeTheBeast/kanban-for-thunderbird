@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Listen for background-triggered refresh signals
   browser.runtime.onMessage.addListener(function (request) {
     if (request.action === "refreshBoard") {
-      initializeBoard();
+      refreshBoard();
     }
   });
 
@@ -72,13 +72,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // Clear existing content
     kanbanColumns.innerHTML = "";
 
-    // Reset all filter state
-    allColumnsData = null;
-    selectedCategories = {};
-    filterInput.value = "";
-    hideDropdown();
-    updateFilterBar();
-
     // Create column containers
     columns.forEach((columnName) => {
       const columnDiv = createColumn(columnName);
@@ -87,6 +80,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Fetch tasks from background script
     fetchTasks();
+  }
+
+  async function refreshBoard() {
+    // Clear existing content
+    kanbanColumns.innerHTML = "";
+    allColumnsData = null;
+
+    // Create column containers
+    columns.forEach((columnName) => {
+      const columnDiv = createColumn(columnName);
+      kanbanColumns.appendChild(columnDiv);
+    });
+
+    await fetchTasks();
+    applyFilters();
   }
 
   function createColumn(columnName) {
@@ -121,24 +129,21 @@ document.addEventListener("DOMContentLoaded", function () {
     return columnDiv;
   }
 
-  function fetchTasks() {
+  async function fetchTasks() {
     // Show loading state
     showLoadingState();
 
     // Send message to background script to get tasks
-    browser.runtime.sendMessage({ action: "getTasks" }, function (response) {
-      console.log("Getting tasks");
-      if (response.error) {
-        console.error("Error fetching tasks:", response.error);
-        showErrorMessage(response.error);
-        return;
-      }
+    const response = await browser.runtime.sendMessage({ action: "getTasks" });
+    if (response.error) {
+      console.error("Error fetching tasks:", response.error);
+      showErrorMessage(response.error);
+      return;
+    }
 
-      if (response.tasks) {
-        console.log("Got some tasks");
-        populateColumns(response.tasks);
-      }
-    });
+    if (response.tasks) {
+      populateColumns(response.tasks);
+    }
   }
 
   function showLoadingState() {
@@ -387,7 +392,6 @@ document.addEventListener("DOMContentLoaded", function () {
               taskId: card.dataset.taskId,
               calendarId: card.dataset.calendarId,
             });
-            initializeBoard(); // Refresh to show the change
           }
         });
 
