@@ -1,0 +1,39 @@
+name: release
+
+on:
+  push:
+    branches: main
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install web-ext
+        run: |
+          npm install --global web-ext
+
+      - name: Create XPI
+        run: |
+          web-ext build
+
+
+      - name: create-release
+        uses: marvinpinto/action-automatic-releases@v1.2.1
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: false
+          files: web-ext-artifacts/*
+

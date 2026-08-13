@@ -1,14 +1,13 @@
 {
   "manifest_version": 2,
   "name": "Tanban",
-  "version": "1.0",
+  "version": "1.0.0",
   "description": "Organize Thunderbird tasks into a Kanban board",
 	"author": "Ratiq Narwal",
   "browser_specific_settings": {
     "gecko": {
       "id": "DogeTheBeast.tanban@addons.thunderbird.net",
-      "strict_min_version": "128.0",
-      "strict_max_version": "*"
+      "strict_min_version": "128.0"
     }
   },
   "background": {
