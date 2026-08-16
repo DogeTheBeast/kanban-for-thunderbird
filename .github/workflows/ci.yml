@@ -21,7 +21,7 @@ jobs:
         id: version
         run: |
           version=$(jq -r ".version" manifest.json)
-          echo "version=$version >> $GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "Version: $version"
         
       - name: Tag commit
