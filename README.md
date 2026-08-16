@@ -90,10 +90,6 @@ Changes to `kanban.js`, `kanban.css`, `kanban.html`, or `background.js` take eff
 
 Changes to files under `calendar/experiments/` require a Thunderbird restart — experiment APIs are loaded at startup and do not hot-reload.
 
-### No build step
-
-This is a plain vanilla WebExtension. No bundler, no transpiler, no `npm install`. Edit any file and reload.
-
 ## API Reference
 
 The extension exposes the following custom browser APIs (via `manifest.json` `experiment_apis`):
