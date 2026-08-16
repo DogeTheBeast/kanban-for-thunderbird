@@ -19,7 +19,7 @@ Organize tasks by dragging them across columns — **To Do**, **In Progress**, *
 
 ## Requirements
 
-- **Thunderbird** 128.0 – 150.*
+- **Thunderbird** 128.0 – latest
 - No external dependencies, build tools, or package managers
 
 ## Installation
