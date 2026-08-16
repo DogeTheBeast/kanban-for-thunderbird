@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -e
+
+echo "Running prehook"
+
+git fetch origin main --quiet
+
+remote_version=$(git show origin/main:manifest.json | jq -r '.version')
+local_version=$(git show HEAD:manifest.json | jq -r '.version')
+
+echo "Remote version: $remote_version"
+echo "Local version:  $local_version"
+
+if [[ "$remote_version" == "$local_version" ]]; then
+    echo "ERROR: Version number must be changed."
+    exit 1
+fi
