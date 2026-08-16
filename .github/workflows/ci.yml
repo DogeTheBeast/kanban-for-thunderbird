@@ -24,12 +24,11 @@ jobs:
         run: |
           npm install --global web-ext
 
-      - name: Create XPI
+      - name: Create XPI 
         run: |
-          web-ext build
+          web-ext build --filename tanban.xpi
 
-
-      - name: create-release
+      - name: Create release
         uses: marvinpinto/action-automatic-releases@v1.2.1
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
