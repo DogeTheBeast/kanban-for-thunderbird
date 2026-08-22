@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Refresh button handler
   refreshBtn.addEventListener("click", function () {
-    initializeBoard();
+    refreshBoard();
   });
 
   initializeBoard();
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (response.error) {
         alert("Failed to create task: " + response.error);
       } else {
-        initializeBoard();
+        refreshBoard();
       }
     });
   });

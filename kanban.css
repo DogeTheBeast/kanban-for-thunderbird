@@ -299,7 +299,7 @@ header h1 {
 
 .task-meta {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   font-size: 0.8em;
   color: #8f8f9d;
 }
