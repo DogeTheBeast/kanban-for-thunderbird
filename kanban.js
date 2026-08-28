@@ -45,6 +45,17 @@ document.addEventListener("DOMContentLoaded", function () {
     setTimeout(hideDropdown, 150);
   });
 
+  // Enter toggles the first dropdown result on/off
+  filterInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      var firstItem = categoryDropdown.querySelector("li[data-category]");
+      if (firstItem) {
+        toggleCategory(firstItem.dataset.category);
+      }
+    }
+  });
+
   // Prevent blur from hiding dropdown when clicking a dropdown item
   categoryDropdown.addEventListener("mousedown", function (e) {
     e.preventDefault();
@@ -229,6 +240,18 @@ document.addEventListener("DOMContentLoaded", function () {
     return result.sort();
   }
 
+  function toggleCategory(cat) {
+    var key = cat.toLowerCase();
+    if (selectedCategories.hasOwnProperty(key)) {
+      delete selectedCategories[key];
+    } else {
+      selectedCategories[key] = cat;
+    }
+    rebuildDropdown(filterInput.value);
+    updateFilterBar();
+    applyFilters();
+  }
+
   function rebuildDropdown(filterText) {
     categoryDropdown.textContent = "";
     var allCats = getAllCategories();
@@ -264,14 +287,7 @@ document.addEventListener("DOMContentLoaded", function () {
       li.appendChild(document.createTextNode(label));
 
       li.addEventListener("click", function () {
-        if (selectedCategories.hasOwnProperty(key)) {
-          delete selectedCategories[key];
-        } else {
-          selectedCategories[key] = cat;
-        }
-        rebuildDropdown(filterInput.value);
-        updateFilterBar();
-        applyFilters();
+        toggleCategory(cat);
       });
       categoryDropdown.appendChild(li);
     });
