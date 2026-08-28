@@ -104,24 +104,45 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   //make the query specific to complete tasks
   //
   if (request.action === "clearDoneTasks") {
-    browser.calendar.items
-      .query({ type: "task" })
-      .then(function (items) {
-        const doneTasks = items.filter(
-          (task) => task.item && task.item.status === "COMPLETED",
-        );
-        const deletePromises = doneTasks.map((task) =>
-          browser.calendar.items.remove(task.calendarId, task.id),
-        );
-        return Promise.all(deletePromises);
-      })
-      .then(function () {
-        sendResponse({ success: true });
-      })
-      .catch(function (error) {
-        console.error("Error clearing done tasks:", error);
-        sendResponse({ error: error.message });
-      });
+    const tasksToDelete = request.tasks;
+
+    if (Array.isArray(tasksToDelete)) {
+      // Per-item catch skips tasks removed between render and click, so one
+      // stale reference doesn't fail the whole batch.
+      const deletePromises = tasksToDelete.map((t) =>
+        browser.calendar.items
+          .remove(t.calendarId, t.id)
+          .catch(() => null),
+      );
+      Promise.all(deletePromises)
+        .then(function () {
+          sendResponse({ success: true });
+        })
+        .catch(function (error) {
+          console.error("Error clearing done tasks:", error);
+          sendResponse({ error: error.message });
+        });
+    } else {
+      // Fallback: legacy behavior (no task list provided → clear all completed)
+      browser.calendar.items
+        .query({ type: "task" })
+        .then(function (items) {
+          const doneTasks = items.filter(
+            (task) => task.item && task.item.status === "COMPLETED",
+          );
+          const deletePromises = doneTasks.map((task) =>
+            browser.calendar.items.remove(task.calendarId, task.id),
+          );
+          return Promise.all(deletePromises);
+        })
+        .then(function () {
+          sendResponse({ success: true });
+        })
+        .catch(function (error) {
+          console.error("Error clearing done tasks:", error);
+          sendResponse({ error: error.message });
+        });
+    }
     return true;
   }
 });

@@ -235,28 +235,28 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function applyFilters() {
+  // A task matches the active filters the same way the board renders it (OR logic)
+  function matchesActiveFilters(task) {
     var selectedKeys = Object.keys(selectedCategories);
+    if (selectedKeys.length === 0) return true;
+    var hasUncategorized = selectedKeys.indexOf(UNCATEGORIZED_KEY) !== -1;
+    var taskCats = task.category || [];
+    // Uncategorized tasks match when the sentinel is selected
+    if (hasUncategorized && taskCats.length === 0) {
+      return true;
+    }
+    // Match by category name (OR logic)
+    return taskCats.some(function (cat) {
+      return selectedKeys.indexOf(cat.toLowerCase()) !== -1;
+    });
+  }
+
+  function applyFilters() {
     var filteredData = {};
 
     columns.forEach(function (columnName) {
       var tasks = allColumnsData[columnName] || [];
-      if (selectedKeys.length === 0) {
-        filteredData[columnName] = tasks;
-      } else {
-        var hasUncategorized = selectedKeys.indexOf(UNCATEGORIZED_KEY) !== -1;
-        filteredData[columnName] = tasks.filter(function (task) {
-          var taskCats = task.category || [];
-          // Uncategorized tasks match when the sentinel is selected
-          if (hasUncategorized && taskCats.length === 0) {
-            return true;
-          }
-          // Match by category name (OR logic)
-          return taskCats.some(function (cat) {
-            return selectedKeys.indexOf(cat.toLowerCase()) !== -1;
-          });
-        });
-      }
+      filteredData[columnName] = tasks.filter(matchesActiveFilters);
     });
 
     populateColumns(filteredData);
@@ -649,7 +649,7 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
           // Optionally, we could update the UI immediately without a full refresh
           // But for simplicity, we'll refresh the board
-          initializeBoard(); // Refresh to show the change
+          refreshBoard(); // Refresh to show the change
         }
       },
     );
@@ -658,16 +658,34 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function clearDoneTasks() {
-    if (!confirm("Delete all completed tasks? This cannot be undone.")) {
+    if (!allColumnsData) return;
+
+    // Completed tasks matching the active filters (Done column is the source)
+    var doneTasks = (allColumnsData["Done"] || []).filter(function (task) {
+      return task.status === "COMPLETED" && matchesActiveFilters(task);
+    });
+
+    var msg =
+      doneTasks.length === 1
+        ? "Delete 1 completed task matching the active filters? This cannot be undone."
+        : "Delete " +
+          doneTasks.length +
+          " completed tasks matching the active filters? This cannot be undone.";
+    if (doneTasks.length === 0 || !confirm(msg)) {
       return;
     }
+
+    var taskRefs = doneTasks.map(function (task) {
+      return { calendarId: task.calendarId, id: task.id };
+    });
+
     browser.runtime.sendMessage(
-      { action: "clearDoneTasks" },
+      { action: "clearDoneTasks", tasks: taskRefs },
       function (response) {
         if (response.error) {
-          alert(`Failed to clear done tasks: ${response.error}`);
+          alert("Failed to clear done tasks: " + response.error);
         } else {
-          initializeBoard();
+          refreshBoard();
         }
       },
     );
