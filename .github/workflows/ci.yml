@@ -47,7 +47,8 @@ jobs:
         uses: marvinpinto/action-automatic-releases@v1.2.1
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "v${{ steps.version.outputs.version }}"
+          automatic_release_tag: "latest"
+          title: "v${{ steps.version.outputs.version }}"
           prerelease: false
           files: web-ext-artifacts/*
 
