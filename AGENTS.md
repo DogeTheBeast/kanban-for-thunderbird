@@ -15,9 +15,9 @@ No build system, no bundler, no transpiler — plain vanilla JS loaded directly.
 ```
 manifest.json          # Extension manifest (experiment_apis, permissions)
 background.js          # Background script — message routing, task CRUD
-kanban.html            # UI shell
-kanban.js              # Frontend — board rendering, drag-and-drop
-kanban.css             # Dark-theme stylesheet
+tanban.html            # UI shell
+tanban.js              # Frontend — board rendering, drag-and-drop
+tanban.css             # Dark-theme stylesheet
 icons/                 # Extension icons (16px, 32px SVG/PNG)
 calendar/experiments/  # Thunderbird calendar experiment APIs
   calendar/
@@ -34,8 +34,8 @@ There is **no package.json, no build system, no test runner, no linter**.
 | Action | Command |
 |--------|---------|
 | Load in Thunderbird | Go to `about:debugging` → This Thunderbird → Load Temporary Add-on → pick `manifest.json` |
-| Pack for distribution | `zip -r kanban-thunderbird.zip . -x "*.git*" "*.zip" "AGENTS.md"` |
-| Quick reload after edit | Press Ctrl+Shift+F5 in the Kanban tab, or use the refresh button |
+| Pack for distribution | `zip -r tanban.zip . -x "*.git*" "*.zip" "AGENTS.md"` |
+| Quick reload after edit | Press Ctrl+Shift+F5 in the Tanban tab, or use the refresh button |
 | Restart required | Changes to `calendar/experiments/` files require a full Thunderbird restart |
 
 There are **no tests** in the project. If adding tests:
@@ -55,14 +55,14 @@ There are **no tests** in the project. If adding tests:
 ### Naming
 - **Files**: `kebab-case.js`, `.sys.mjs` for experiment modules, `.json` for schemas
 - **Classes/ExtensionAPIs**: `PascalCase` (e.g., `ExtensionAPI`, `EventManager`, `CalEvent`)
-- **Functions & variables**: `camelCase` (e.g., `processTasksForKanban`, `draggedTask`)
+- **Functions & variables**: `camelCase` (e.g., `processTasksForTanban`, `draggedTask`)
 - **Constants**: `UPPER_SNAKE_CASE` for status values (e.g., `COMPLETED`, `NEEDS-ACTION`)
 - **CSS classes**: `kebab-case` (e.g., `task-card`, `column-header`, `empty-column`)
-- **CSS IDs**: `kebab-case` (e.g., `kanban-columns`, `new-task-btn`, `refresh-btn`)
+- **CSS IDs**: `kebab-case` (e.g., `tanban-columns`, `new-task-btn`, `refresh-btn`)
 
 ### Imports
 
-**Frontend (`kanban.js`, `background.js`)** — no import statements, uses `browser.*` global:
+**Frontend (`tanban.js`, `background.js`)** — no import statements, uses `browser.*` global:
 ```javascript
 browser.runtime.sendMessage({ action: "getTasks" }, function (response) { ... });
 browser.calendar.items.query({ type: "task" }).then(...).catch(...);

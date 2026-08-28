@@ -1,4 +1,4 @@
-/* Kanban Thunderbird Styles */
+/* Tanban Thunderbird Styles */
 
 body {
   font-family:
@@ -193,14 +193,14 @@ header h1 {
   background-color: #0060df;
 }
 
-#kanban-columns {
+#tanban-columns {
   display: flex;
   gap: 15px;
   overflow-x: auto;
   padding-bottom: 20px;
 }
 
-.kanban-column {
+.tanban-column {
   flex: 1;
   min-width: 0;
   background-color: #2a2a2e;
@@ -323,7 +323,7 @@ header h1 {
   transform: scale(1.02);
 }
 
-.kanban-column.dragover {
+.tanban-column.dragover {
   border-top: 3px solid #0a84ff;
 }
 
@@ -341,7 +341,7 @@ header h1 {
     padding: 5px;
   }
 
-  .kanban-column {
+  .tanban-column {
     flex: 1;
     min-width: 0;
   }

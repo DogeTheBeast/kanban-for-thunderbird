@@ -1,4 +1,4 @@
-# Kanban Thunderbird
+# Tanban Thunderbird
 
 A Thunderbird Mail Extension that turns your tasks into a visual Kanban board.
 
@@ -33,7 +33,7 @@ Organize tasks by dragging them across columns — **To Do**, **In Progress**, *
 ### Permanent (packed extension)
 
 ```bash
-zip -r kanban-thunderbird.zip . -x "*.git*" "*.zip" "AGENTS.md"
+zip -r tanban.zip . -x "*.git*" "*.zip" "AGENTS.md"
 ```
 
 Then install the `.zip` via Thunderbird's Add-ons Manager (gear menu → Install Add-on From File…).
@@ -43,9 +43,9 @@ Then install the `.zip` via Thunderbird's Add-ons Manager (gear menu → Install
 ```
 manifest.json            # Extension manifest with 6 experiment_apis
 background.js            # Background script — message routing, task CRUD
-kanban.html              # Main UI shell
-kanban.js                # Frontend — board rendering, drag-and-drop
-kanban.css               # Dark-theme stylesheet
+tanban.html              # Main UI shell
+tanban.js                # Frontend — board rendering, drag-and-drop
+tanban.css               # Dark-theme stylesheet
 icons/                   # Extension icons (16px, 32px SVG/PNG)
 calendar/experiments/    # Thunderbird calendar experiment APIs
   calendar/
@@ -59,14 +59,14 @@ calendar/experiments/    # Thunderbird calendar experiment APIs
 
 The extension has three layers:
 
-1. **Frontend** (`kanban.js`) — renders the board in a tab, manages drag-and-drop, sends messages to the background script
+1. **Frontend** (`tanban.js`) — renders the board in a tab, manages drag-and-drop, sends messages to the background script
 2. **Background script** (`background.js`) — listens for messages from the frontend, proxies requests to calendar APIs, forwards real-time change events back to the frontend
 3. **Experiment APIs** (`calendar/experiments/`) — six Thunderbird-specific APIs that bridge WebExtension code to Mozilla's internal calendar services (`calUtils`, `CalEvent`, `CalTodo`, etc.)
 
 ### Communication flow
 
 ```
-Frontend (kanban.js)
+Frontend (tanban.js)
   │  browser.runtime.sendMessage({ action: "getTasks" })
   ▼
 Background (background.js)
@@ -84,7 +84,7 @@ Calendar changes (create/update/delete) are pushed back in real time via `browse
 
 ### Quick reload
 
-Changes to `kanban.js`, `kanban.css`, `kanban.html`, or `background.js` take effect after refreshing the Kanban tab (Ctrl+Shift+F5 or the **Refresh Tasks** button).
+Changes to `tanban.js`, `tanban.css`, `tanban.html`, or `background.js` take effect after refreshing the Tanban tab (Ctrl+Shift+F5 or the **Refresh Tasks** button).
 
 ### Full restart required
 

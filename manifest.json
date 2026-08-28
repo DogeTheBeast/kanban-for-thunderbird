@@ -90,9 +90,9 @@
     }
 	},
   "web_accessible_resources": [
-    "kanban.html",
-    "kanban.css",
-    "kanban.js",
+    "tanban.html",
+    "tanban.css",
+    "tanban.js",
     "icons/*"
   ]
 }

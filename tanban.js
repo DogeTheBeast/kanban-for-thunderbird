@@ -1,7 +1,7 @@
-// Kanban Thunderbird UI Logic
+// Tanban Thunderbird UI Logic
 
 document.addEventListener("DOMContentLoaded", function () {
-  const kanbanColumns = document.getElementById("kanban-columns");
+  const tanbanColumns = document.getElementById("tanban-columns");
   const refreshBtn = document.getElementById("refresh-btn");
   const newTaskBtn = document.getElementById("new-task-btn");
 
@@ -61,6 +61,20 @@ document.addEventListener("DOMContentLoaded", function () {
     e.preventDefault();
   });
 
+  // Ctrl+F (or Cmd+F on macOS) focuses the category filter box
+  document.addEventListener("keydown", function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "f") {
+      // Don't hijack Ctrl+Shift+F (Thunderbird's "Search messages") or Alt combos
+      if (e.shiftKey || e.altKey) return;
+
+      e.preventDefault(); // Suppress native "Find in page" bar
+      filterInput.focus();
+      filterInput.select(); // Pre-select existing text so typing replaces it
+      rebuildDropdown(filterInput.value);
+      showDropdown();
+    }
+  });
+
   // Refresh button handler
   refreshBtn.addEventListener("click", function () {
     refreshBoard();
@@ -81,12 +95,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function initializeBoard() {
     // Clear existing content
-    kanbanColumns.innerHTML = "";
+    tanbanColumns.innerHTML = "";
 
     // Create column containers
     columns.forEach((columnName) => {
       const columnDiv = createColumn(columnName);
-      kanbanColumns.appendChild(columnDiv);
+      tanbanColumns.appendChild(columnDiv);
     });
 
     // Fetch tasks from background script
@@ -95,13 +109,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   async function refreshBoard() {
     // Clear existing content
-    kanbanColumns.innerHTML = "";
+    tanbanColumns.innerHTML = "";
     allColumnsData = null;
 
     // Create column containers
     columns.forEach((columnName) => {
       const columnDiv = createColumn(columnName);
-      kanbanColumns.appendChild(columnDiv);
+      tanbanColumns.appendChild(columnDiv);
     });
 
     await fetchTasks();
@@ -110,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function createColumn(columnName) {
     const columnDiv = document.createElement("div");
-    columnDiv.className = "kanban-column";
+    columnDiv.className = "tanban-column";
 
     const headerDiv = document.createElement("div");
     headerDiv.className = "column-header";
@@ -510,7 +524,7 @@ document.addEventListener("DOMContentLoaded", function () {
     this.classList.remove("dragging");
 
     // Remove dragover classes from all columns
-    document.querySelectorAll(".kanban-column").forEach((col) => {
+    document.querySelectorAll(".tanban-column").forEach((col) => {
       col.classList.remove("dragover");
     });
   }
@@ -555,7 +569,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Get target column
-    const targetColumnEl = this.closest(".kanban-column");
+    const targetColumnEl = this.closest(".tanban-column");
     if (!targetColumnEl) return;
 
     const targetColumnName =

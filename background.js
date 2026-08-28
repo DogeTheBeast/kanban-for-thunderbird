@@ -1,7 +1,7 @@
-// Background script for Kanban Thunderbird extension
+// Background script for Tanban Thunderbird extension
 
-browser.spaces.create("Kanban_Board", "kanban.html", {
-  title: "Kanban Board",
+browser.spaces.create("Tanban_Board", "tanban.html", {
+  title: "Tanban Board",
   defaultIcons: "icons/sidebar.png",
 });
 
@@ -10,7 +10,7 @@ browser.calendar.items.onUpdated.addListener(function (item, changeInfo) {
   if (item.type !== "task") return;
 
   browser.tabs
-    .query({ url: browser.runtime.getURL("kanban.html") })
+    .query({ url: browser.runtime.getURL("tanban.html") })
     .then(function (tabs) {
       for (const tab of tabs) {
         browser.tabs.sendMessage(tab.id, { action: "refreshBoard" });
@@ -22,7 +22,7 @@ browser.calendar.items.onCreated.addListener(function (item, changeInfo) {
   if (item.type !== "task") return;
 
   browser.tabs
-    .query({ url: browser.runtime.getURL("kanban.html") })
+    .query({ url: browser.runtime.getURL("tanban.html") })
     .then(function (tabs) {
       for (const tab of tabs) {
         browser.tabs.sendMessage(tab.id, { action: "refreshBoard" });
@@ -34,7 +34,7 @@ browser.calendar.items.onRemoved.addListener(function (item, changeInfo) {
   if (item.type !== "task") return;
 
   browser.tabs
-    .query({ url: browser.runtime.getURL("kanban.html") })
+    .query({ url: browser.runtime.getURL("tanban.html") })
     .then(function (tabs) {
       for (const tab of tabs) {
         browser.tabs.sendMessage(tab.id, { action: "refreshBoard" });
@@ -49,8 +49,8 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     browser.calendar.items
       .query({ type: "task" })
       .then(function (items) {
-        // Process tasks for Kanban display
-        const processedTasks = processTasksForKanban(items);
+        // Process tasks for Tanban display
+        const processedTasks = processTasksForTanban(items);
         sendResponse({ tasks: processedTasks });
       })
       .catch(function (error) {
@@ -126,11 +126,11 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 });
 
-// Helper function to process tasks for Kanban display
-function processTasksForKanban(tasks) {
+// Helper function to process tasks for Tanban display
+function processTasksForTanban(tasks) {
   // Filter only tasks (not events) - though query already filters by type: "task"
   // Group tasks by status/category (we'll infer from available properties)
-  const kanbanColumns = {
+  const tanbanColumns = {
     "To Do": [],
     "In Progress": [],
     Done: [],
@@ -168,7 +168,7 @@ function processTasksForKanban(tasks) {
         task.item.status !== undefined ? columnMap[task.item.status] : "To Do";
     }
 
-    kanbanColumns[column].push({
+    tanbanColumns[column].push({
       id: task.id,
       calendarId: task.calendarId,
       title: task.item.summary || "Untitled Task",
@@ -179,5 +179,5 @@ function processTasksForKanban(tasks) {
     });
   });
 
-  return kanbanColumns;
+  return tanbanColumns;
 }
