@@ -80,6 +80,42 @@ document.addEventListener("DOMContentLoaded", function () {
     refreshBoard();
   });
 
+  // Light/dark theme slider (click-only, no keyboard handling)
+  var themeSlider = document.getElementById("theme-slider");
+
+  function applyTheme(isLight) {
+    themeSlider.classList.toggle("light", isLight);
+    document.body.classList.toggle("light-theme", isLight);
+    browser.storage.local.set({ theme: isLight ? "light" : "dark" });
+    refreshCategoryColors();
+  }
+
+  // Recolor already-rendered category pills to match the current theme
+  function refreshCategoryColors() {
+    // Task card category pills
+    document.querySelectorAll(".task-category").forEach(function (el) {
+      el.style.backgroundColor = getCategoryColor(el.textContent);
+    });
+    // Filter bar chips
+    document.querySelectorAll(".filter-chip").forEach(function (chip) {
+      if (chip.dataset.category !== undefined) {
+        chip.style.backgroundColor = getCategoryColor(chip.dataset.category);
+      }
+    });
+  }
+
+  themeSlider.addEventListener("click", function () {
+    applyTheme(!themeSlider.classList.contains("light"));
+  });
+
+  // Restore saved theme preference on load
+  browser.storage.local.get("theme", function (data) {
+    var isLight = data.theme === "light";
+    themeSlider.classList.toggle("light", isLight);
+    document.body.classList.toggle("light-theme", isLight);
+    refreshCategoryColors();
+  });
+
   initializeBoard();
 
   // New task button handler
@@ -337,6 +373,7 @@ document.addEventListener("DOMContentLoaded", function () {
       var displayName = cat === UNCATEGORIZED_KEY ? UNCATEGORIZED_LABEL : cat;
       var chip = document.createElement("span");
       chip.className = "filter-chip";
+      chip.dataset.category = cat;
       chip.style.backgroundColor = getCategoryColor(cat);
 
       var label = document.createTextNode(displayName);
@@ -638,16 +675,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Generate consistent color from category name using hash
   function getCategoryColor(categoryName) {
+    var isLight = document.body.classList.contains("light-theme");
     // Uncategorized gets a neutral grey
     if (categoryName === UNCATEGORIZED_KEY) {
-      return "hsl(0, 0%, 32%)";
+      return isLight ? "hsl(0, 0%, 78%)" : "hsl(0, 0%, 32%)";
     }
     let hash = 0;
     for (let i = 0; i < categoryName.length; i++) {
       hash = categoryName.charCodeAt(i) + ((hash << 5) - hash);
     }
     const hue = Math.abs(hash) % 360;
-    return `hsl(${hue}, 60%, 28%)`;
+    return isLight ? `hsl(${hue}, 65%, 78%)` : `hsl(${hue}, 60%, 28%)`;
   }
 
   // Expose browser object for compatibility
