@@ -23,6 +23,27 @@ jobs:
           version=$(jq -r ".version" manifest.json)
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "Version: $version"
+
+      - name: Get previous tag
+        id: previous_tag
+        run: |
+          previous_tag=$(git describe --tags --abbrev=0 2>/dev/null || true)
+          echo "tag=$previous_tag" >> "$GITHUB_OUTPUT"
+          echo "Previous tag: $previous_tag"
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          previous_tag="${{ steps.previous_tag.outputs.tag }}"
+
+          if [ -n "$previous_tag" ]; then
+            git log "$previous_tag"..HEAD --pretty=format:"- %s" > changelog.txt
+          else
+            git log HEAD --pretty=format:"- %s" > changelog.txt
+          fi
+
+          echo "Changes:"
+          cat changelog.txt
         
       - name: Tag commit
         run: |
@@ -49,6 +70,6 @@ jobs:
         run: |
           gh release create "v${{ steps.version.outputs.version }}" \
             --title "v${{ steps.version.outputs.version }}" \
-            --generate-notes \
+            --notes-file changelog.txt \
             web-ext-artifacts/tanban.xpi
 
